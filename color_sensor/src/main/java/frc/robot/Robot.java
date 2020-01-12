@@ -13,7 +13,11 @@ import edu.wpi.first.wpilibj.I2C;
 
 import edu.wpi.first.wpilibj.util.Color;
 
+import java.io.IOException;
+
 import com.revrobotics.ColorSensorV3;
+
+import frc.robot.ColorServer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -23,40 +27,14 @@ import com.revrobotics.ColorSensorV3;
  * project.
  */
 /*----------------------------------------------------------------------------*/
-/* Copyright (c) 2017-2018 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
+/* Copyright (c) 2017-2018 FIRST. All Rights Reserved. */
+/* Open Source Software - may be modified and shared by FRC teams. The code */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
+/* the project. */
 /*----------------------------------------------------------------------------*/
 
-
-
-
 public class Robot extends TimedRobot {
-
-  /*
-   * static double P = 0.6; static double I = 0.0; static double D = 0.0;
-   */
-  // The "right" side gets the steering encoder.
-  // The "left" side doesn't get squat because we didn't finish everything in
-  // time.
-  // public static void AdityaHasABigBrain() {
-
-  // right.configSelectedFeedbackSensor( FeedbackDevice.CTRE_MagEncoder_Relative,
-  // 0, 10); // Configuration Timeout
-
-  /*
-   * setPid(P, I, D); .config_kF(1,1023.0/100.0,10); right.selectProfileSlot(0,
-   * 0); right.selectProfileSlot(1,1); right.setSensorPhase(inverted1);
-   * 
-   * right.setSelectedSensorPosition(0);
-   * 
-   * right.getSensorCollection().setQuadraturePosition(0, 10); }
-   * 
-   * public static void setPid(double P, double I, double D) { right.config_kP(0,
-   * P, 10); right.config_kI(0, I, 10); right.config_kD(0, D, 10); }
-   */
-
+  private ColorServer colorSender;
   /**
    * Change the I2C port below to match the connection of your color sensor
    */
@@ -69,7 +47,17 @@ public class Robot extends TimedRobot {
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
 
   @Override
-  public void robotInit() {}
+  public void robotInit() {
+    colorSender = new ColorServer();
+
+    //Initialize TCP connection
+    try {
+      colorSender.init();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 
   @Override
   public void robotPeriodic() {
@@ -111,7 +99,14 @@ public class Robot extends TimedRobot {
     green /= maxC;
     blue /= maxC;*/
 
-  
+    //Send RGB values to client(laptop)
+    try {
+      colorSender.colorSend(red, green, blue);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
     // r 0.250, g 0.474 b 0.275
 
     SmartDashboard.putNumber("Cyan", c);
