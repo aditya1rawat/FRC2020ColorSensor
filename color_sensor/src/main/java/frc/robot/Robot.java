@@ -35,6 +35,8 @@ import frc.robot.ColorServer;
 
 public class Robot extends TimedRobot {
   private ColorServer colorSender;
+  
+  private Constants constants = new Constants();
   /**
    * Change the I2C port below to match the connection of your color sensor
    */
@@ -95,9 +97,17 @@ public class Robot extends TimedRobot {
     m*=100;
     y*=100;
     k*=100;
+
+
     /*red /= maxC;
     green /= maxC;
     blue /= maxC;*/
+
+    c/=constants.CYANCALIBRATION;
+    m/=constants.MAGENTACALIBRATION;
+    y/=constants.YELLOWCALIBRATION;
+
+
 
     //Send RGB values to client(laptop)
     try {
