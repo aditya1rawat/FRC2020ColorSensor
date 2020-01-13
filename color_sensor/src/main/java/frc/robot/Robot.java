@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import java.io.IOException;
 
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.ColorSensorV3.RawColor;
 
 import frc.robot.ColorServer;
 
@@ -35,7 +36,7 @@ import frc.robot.ColorServer;
 
 public class Robot extends TimedRobot {
   private ColorServer colorSender;
-  
+
   private Constants constants = new Constants();
   /**
    * Change the I2C port below to match the connection of your color sensor
@@ -52,12 +53,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     colorSender = new ColorServer();
 
-    //Initialize TCP connection
+    // Initialize TCP connection
     try {
       colorSender.init();
     } catch (IOException e) {
       // TODO Auto-generated catch block
-      //System.out.println("Didn't work. :(");
+      // System.out.println("Didn't work. :(");
       e.printStackTrace();
     }
   }
@@ -74,7 +75,10 @@ public class Robot extends TimedRobot {
      * is the more light from the surroundings will bleed into the measurements and
      * make it difficult to accurately determine its color.
      */
-    Color detectedColor = m_colorSensor.getColor();
+    RawColor detectedColor = m_colorSensor.getRawColor();
+
+
+    System.out.println("Red:"+detectedColor.red+" Green"+detectedColor.green+" Blue"+detectedColor.blue);
     /**
      * The sensor returns a raw IR value of the infrared light detected.
      */
@@ -83,11 +87,12 @@ public class Robot extends TimedRobot {
      * Open Smart Dashboard or Shuffleboard to see the color detected by the sensor.
      **/
 
+
+     //Callibration
     double red = detectedColor.red * 1.0/0.2509;  /// 0.250;
     double green = detectedColor.green * 1.0/0.473; // / 0.474;
     double blue = detectedColor.blue * 1.0/0.274; // / 0.275;
 
-    System.out.println("Red:"+red+" Green"+green+" Blue"+blue);
    /* double c = (maxC-red)/maxC;
     double m = (maxC-green)/maxC;
     double y = (maxC-blue)/maxC;
@@ -110,6 +115,9 @@ public class Robot extends TimedRobot {
    
     double maxC = Math.max(Math.max(red, green), blue);
 
+
+    //Normalization here
+    
     red/=maxC;
     green/=maxC;
     blue/=maxC;
