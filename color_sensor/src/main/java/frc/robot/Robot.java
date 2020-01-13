@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
       colorSender.init();
     } catch (IOException e) {
       // TODO Auto-generated catch block
+      //System.out.println("Didn't work. :(");
       e.printStackTrace();
     }
   }
@@ -82,13 +83,12 @@ public class Robot extends TimedRobot {
      * Open Smart Dashboard or Shuffleboard to see the color detected by the sensor.
      **/
 
-    double red = detectedColor.red;  /// 0.250;
-    double green = detectedColor.green; // / 0.474;
-    double blue = detectedColor.blue; // / 0.275;
+    double red = detectedColor.red * 1.0/0.2509;  /// 0.250;
+    double green = detectedColor.green * 1.0/0.473; // / 0.474;
+    double blue = detectedColor.blue * 1.0/0.274; // / 0.275;
 
-    double maxC = Math.max(Math.max(red, green), blue);
-
-    double c = (maxC-red)/maxC;
+    System.out.println("Red:"+red+" Green"+green+" Blue"+blue);
+   /* double c = (maxC-red)/maxC;
     double m = (maxC-green)/maxC;
     double y = (maxC-blue)/maxC;
     double k = (1-maxC);
@@ -96,22 +96,32 @@ public class Robot extends TimedRobot {
     c*=100;
     m*=100;
     y*=100;
-    k*=100;
+    k*=100;*/
 
 
     /*red /= maxC;
     green /= maxC;
     blue /= maxC;*/
 
-    c/=constants.CYANCALIBRATION;
+    /*c/=constants.CYANCALIBRATION;
     m/=constants.MAGENTACALIBRATION;
-    y/=constants.YELLOWCALIBRATION;
+    y/=constants.YELLOWCALIBRATION;*/
+    
+   
+    double maxC = Math.max(Math.max(red, green), blue);
 
+    red/=maxC;
+    green/=maxC;
+    blue/=maxC;
 
+    /*SmartDashboard.putNumber("Cyan", c);
+    SmartDashboard.putNumber("Magenta", m);
+    SmartDashboard.putNumber("Yellow", y);
+    SmartDashboard.putNumber("Black", k);*/
 
     //Send RGB values to client(laptop)
     try {
-      colorSender.colorSend(red, green, blue);
+      colorSender.colorSend(red *255 , green*255, blue*255);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
@@ -119,10 +129,6 @@ public class Robot extends TimedRobot {
 
     // r 0.250, g 0.474 b 0.275
 
-    SmartDashboard.putNumber("Cyan", c);
-    SmartDashboard.putNumber("Magenta", m);
-    SmartDashboard.putNumber("Yellow", y);
-    SmartDashboard.putNumber("Black", k);
 
     //System.out.println(detectedColor.red*255+" "+detectedColor.green*255+" "+detectedColor.blue*255);
 

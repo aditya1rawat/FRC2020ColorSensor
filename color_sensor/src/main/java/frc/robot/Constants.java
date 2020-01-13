@@ -1,8 +1,8 @@
 package frc.robot;
 
 public class Constants {
-    public final double CYANCALIBRATION = 0;
-    public final double MAGENTACALIBRATION = 0;
-    public final double YELLOWCALIBRATION = 0;
+    public final double RED = 65/255;
+    public final double GREEN = 125/255;
+    public final double BLUE = 65/255;
 
 }

@@ -15,11 +15,14 @@ public class ColorServer {
     }
 
     public void colorSend(double r, double g, double b)  throws IOException{
-        String[] rgbArr = {""+(int)(r*255), ""+(int)(g*255), ""+(int)(b*255)+", "};
+
+        String[] rgbArr = {""+(int)(r*1), ""+(int)(g*1), ""+(int)(b*1)+", "};
         rgb = String.join(",", rgbArr) + "\n";
 
         Socket connectionSocket = welcomeSocket.accept();
-        connectionSocket.isConnected();
+        //System.out.println("This ran.");
+
+        //connectionSocket.isConnected();
         BufferedReader inFromClient = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         DataOutputStream outToClient = new DataOutputStream(connectionSocket.getOutputStream());
         
@@ -33,4 +36,4 @@ public class ColorServer {
         System.out.println("Connection closed");
         connectionSocket.close();
     }
-}
+}   
