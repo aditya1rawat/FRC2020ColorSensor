@@ -29,11 +29,11 @@ public class ColorServer {
         while((clientSentence = inFromClient.readLine()) != null) {
         
 
-            System.out.println("Received: "+clientSentence);
+            //System.out.println("Received: "+clientSentence);
             //capitalizedSentence = clientSentence.toUpperCase() + 'n';
             outToClient.writeBytes(rgb);
         }
-        System.out.println("Connection closed");
+        //System.out.println("Connection closed");
         connectionSocket.close();
     }
 }   

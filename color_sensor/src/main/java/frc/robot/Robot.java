@@ -17,6 +17,8 @@ import java.io.IOException;
 
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.ColorSensorV3.RawColor;
+import com.revrobotics.ColorMatchResult;
+import com.revrobotics.ColorMatch;
 
 import frc.robot.ColorServer;
 
@@ -27,6 +29,8 @@ import frc.robot.ColorServer;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
+
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2017-2018 FIRST. All Rights Reserved. */
 /* Open Source Software - may be modified and shared by FRC teams. The code */
@@ -43,11 +47,31 @@ public class Robot extends TimedRobot {
    */
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
 
+
+
   /**
    * A Rev Color Sensor V3 object is constructed with an I2C port as a parameter.
    * The device will be automatically initialized with default parameters.
    */
+
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+
+
+  //color Match colors
+  private final ColorMatch m_colorMatcher = new ColorMatch();
+  private final Color kBlueTarget = ColorMatch.makeColor(0.219, 0.465, 0.315); //0.113, 0.422, 0.463
+  private final Color kGreenTarget = ColorMatch.makeColor(0.236, 0.483, 0.280); //0.163, 0.580, 0.256
+  private final Color kRedTarget = ColorMatch.makeColor(0.269, 0.463, 0.265); // 0.521, 0.345, 0.133
+  private final Color kYellowTarget = ColorMatch.makeColor(0.276, 0.489, 0.233); //0.312, 0.564, 0.122
+  private final Color kWhiteTarget = ColorMatch.makeColor(0.250, 0.483, 0.265); //0.250, 0.483, 0.265
+
+  //Order of the color on the color wheel
+
+  String[] controlPanelColor = {"Yellow", "Blue", "Green", "Red", "Yellow", "Blue", "Green", "Red"};
+  int wheelPosition = 0;
+  int wheelRotation = 0;
+
+
 
   @Override
   public void robotInit() {
@@ -61,6 +85,16 @@ public class Robot extends TimedRobot {
       // System.out.println("Didn't work. :(");
       e.printStackTrace();
     }
+
+    wheelPosition = 0;
+    wheelRotation = 0;
+    //adding targets for colormatching
+    m_colorMatcher.addColorMatch(kBlueTarget);
+    m_colorMatcher.addColorMatch(kGreenTarget);
+    m_colorMatcher.addColorMatch(kRedTarget);
+    m_colorMatcher.addColorMatch(kYellowTarget);   
+    m_colorMatcher.addColorMatch(kWhiteTarget);
+
   }
 
   @Override
@@ -75,23 +109,70 @@ public class Robot extends TimedRobot {
      * is the more light from the surroundings will bleed into the measurements and
      * make it difficult to accurately determine its color.
      */
-    RawColor detectedColor = m_colorSensor.getRawColor();
 
 
-    System.out.println("Red:"+detectedColor.red+" Green"+detectedColor.green+" Blue"+detectedColor.blue);
-    /**
-     * The sensor returns a raw IR value of the infrared light detected.
-     */
 
-    /**
-     * Open Smart Dashboard or Shuffleboard to see the color detected by the sensor.
-     **/
+
+     //get Color
+    Color rawDetectedColor = m_colorSensor.getColor();
+    Color detectedColor = m_colorSensor.getColor();
+
+
+
+  //System.out.println("Raw Detected Color:  Red:"+rawDetectedColor.red+" Green"+rawDetectedColor.green+" Blue"+rawDetectedColor.blue);
+
+
+    String colorString;
+    ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
+
+
+
+    //get Color Looking at
+    if (match.color == kBlueTarget) {
+      colorString = "Blue";
+    } else if (match.color == kRedTarget) {
+      colorString = "Red";
+    } else if (match.color == kGreenTarget) {
+      colorString = "Green";
+    } else if (match.color == kYellowTarget) {
+      colorString = "Yellow";
+    } else {
+      colorString = "Unknown";
+    }
+
+
+
+    //check that color is not unknown
+    if (colorString!="Unknown"){
+
+      //loop until we find the color we are looking at
+      while (true){
+        
+        //check if we reached the curent color the sensor sees
+        if (controlPanelColor[wheelPosition] == colorString){
+          //if we do exit
+          break;
+        }
+        
+        wheelPosition++;
+        //check if we completed a rotation
+        if (wheelPosition == controlPanelColor.length ){
+          wheelPosition = 0;
+          wheelRotation++;
+        }
+
+      }
+
+    }
+
+    System.out.println("Rotations: " + wheelRotation+ " Wheel Position: " + wheelPosition + " Confidence: " +     match.confidence);
+    
 
 
      //Callibration
-    double red = detectedColor.red * 1.0/0.2509;  /// 0.250;
-    double green = detectedColor.green * 1.0/0.473; // / 0.474;
-    double blue = detectedColor.blue * 1.0/0.274; // / 0.275;
+    double red = rawDetectedColor.red * 1.0/0.2509;  /// 0.250;
+    double green = rawDetectedColor.green * 1.0/0.473; // / 0.474;
+    double blue = rawDetectedColor.blue * 1.0/0.274; // / 0.275;
 
    /* double c = (maxC-red)/maxC;
     double m = (maxC-green)/maxC;
@@ -148,21 +229,7 @@ public class Robot extends TimedRobot {
     }*/
 
 
-   //System.out.println((int)(cyan*100) + " " + (int)(magenta*100) + " " + (int)(yellow*100) + " " + (int)(black*100));
-    /**
-     * In addition to RGB IR values, the color sensor can also return an 
-     * infrared proximity value. The chip contains an IR led which will emit
-     * IR pulses and measure the intensity of the return. When an object is 
-     * close the value of the proximity will be large (max 2047 with default
-     * settings) and will approach zero when the object is far away.
-     * 
-     * Proximity can be used to roughly approximate the distance of an object
-     * or provide a threshold for when an object is close enough to provide
-     * accurate color values.
-     */
-  
-
-    
+   //System.out.println((int)(cyan*100) + " " + (int)(magenta*100) + " " + (int)(yellow*100) + " " + (int)(black*100)); 
 
   }
 }
